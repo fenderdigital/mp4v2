@@ -216,6 +216,7 @@ set(MP4V2_SOURCE_FILES
         src/qtff/PictureAspectRatioBox.cpp
         src/3gp.cpp
         src/atom_ac3.cpp
+        src/atom_alac.cpp
         src/atom_amr.cpp
         src/atom_avc1.cpp
         src/atom_avcC.cpp
