@@ -272,6 +272,11 @@ public:
         uint8_t lfeon,
         uint8_t bit_rate_code);
 
+    MP4TrackId AddALACAudioTrack(
+        uint32_t       samplingRate,
+        const uint8_t* magicCookie,
+        uint16_t       magicCookieSize );
+
     MP4TrackId AddEncAudioTrack( // ismacryp
         uint32_t timeScale,
         MP4Duration sampleDuration,

@@ -783,7 +783,11 @@ MP4Atom::factory( MP4File &file, MP4Atom* parent, const char* type )
     if( parent ) {
         const char* const ptype = parent->GetType();
 
-        if( descendsFrom( parent, "ilst" )) {
+        if( ATOMID( ptype ) == ATOMID( "stsd" )) {
+            if( ATOMID( type ) == ATOMID( "alac" ))
+                return new MP4SoundAtom( file, type );
+        }
+        else if( descendsFrom( parent, "ilst" )) {
             if( ATOMID( ptype ) == ATOMID( "ilst" )) {
                ASSERT( ATOMID( type ) != ATOMID( "ilst" ));  // don't allow ilst to be a child of ilst
                return new MP4ItemAtom( file, type );
@@ -824,6 +828,8 @@ MP4Atom::factory( MP4File &file, MP4Atom* parent, const char* type )
             break;
 
         case 'a':
+            if( ATOMID(type) == ATOMID("alac") )
+                return new MP4AlacAtom(file);
             if( ATOMID(type) == ATOMID("avc1") )
                 return new MP4Avc1Atom(file);
             if( ATOMID(type) == ATOMID("ac-3") )
@@ -833,8 +839,6 @@ MP4Atom::factory( MP4File &file, MP4Atom* parent, const char* type )
             if( ATOMID(type) == ATOMID("alis") )
                 return new MP4UrlAtom( file, type );
             if( ATOMID(type) == ATOMID("alaw") )
-                return new MP4SoundAtom( file, type );
-            if( ATOMID(type) == ATOMID("alac") )
                 return new MP4SoundAtom( file, type );
             break;
 

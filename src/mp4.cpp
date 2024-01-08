@@ -976,6 +976,28 @@ MP4FileHandle MP4ModifyCallbacks(const MP4IOCallbacks* callbacks,
         return MP4_INVALID_TRACK_ID;
     }
 
+    MP4TrackId MP4AddALACAudioTrack(
+        MP4FileHandle  hFile,
+        uint32_t       timeScale,
+        const uint8_t* magicCookie,
+        uint16_t       magicCookieSize )
+    {
+        if (MP4_IS_VALID_FILE_HANDLE(hFile)) {
+            try {
+                return ((MP4File*)hFile)->
+                AddALACAudioTrack(timeScale, magicCookie, magicCookieSize);
+            }
+            catch( Exception* x ) {
+                mp4v2::impl::log.errorf(*x);
+                delete x;
+            }
+            catch( ... ) {
+                mp4v2::impl::log.errorf( "%s: failed", __FUNCTION__ );
+            }
+        }
+        return MP4_INVALID_TRACK_ID;
+    }
+
     MP4TrackId MP4AddEncAudioTrack(MP4FileHandle hFile,
                                    uint32_t timeScale,
                                    MP4Duration sampleDuration,

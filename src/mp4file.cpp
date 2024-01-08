@@ -1600,6 +1600,51 @@ MP4TrackId MP4File::AddAC3AudioTrack(
     return trackId;
 }
 
+MP4TrackId MP4File::AddALACAudioTrack(
+    uint32_t       timeScale,
+    const uint8_t* magicCookie,
+    uint16_t       magicCookieSize )
+{
+    MP4TrackId trackId = AddTrack(MP4_AUDIO_TRACK_TYPE, timeScale);
+
+    AddTrackToOd(trackId); 
+
+    SetTrackFloatProperty(trackId, "tkhd.volume", 1.0);
+
+    InsertChildAtom(MakeTrackName(trackId, "mdia.minf"), "smhd", 0);
+
+    AddChildAtom(MakeTrackName(trackId, "mdia.minf.stbl.stsd"), "alac");
+
+    AddChildAtom(MakeTrackName(trackId, "mdia.minf.stbl.stsd.alac"), "alac");
+
+    if (timeScale & 0xffff0000) // avoid overflow of alac.timeScale
+        timeScale = 44100;
+    SetTrackIntegerProperty(trackId,
+                            "mdia.minf.stbl.stsd.alac.timeScale", timeScale << 16);
+
+    AddDescendantAtoms(MakeTrackName(trackId, NULL), "udta.name");
+
+    // stsd is a unique beast in that it has a count of the number
+    // of child atoms that needs to be incremented after we add the mp4a atom
+    MP4Integer32Property* pStsdCountProperty;
+    FindIntegerProperty(
+                        MakeTrackName(trackId, "mdia.minf.stbl.stsd.entryCount"),
+                        (MP4Property**)&pStsdCountProperty);
+    pStsdCountProperty->IncrementValue();
+
+    MP4BytesProperty* pCookieProperty = NULL;
+    FindBytesProperty(
+        MakeTrackName(trackId, "mdia.minf.stbl.stsd.alac.alac.magicCookie"),
+        (MP4Property**)&pCookieProperty);
+    if (pCookieProperty) {
+        pCookieProperty->SetValue(magicCookie, magicCookieSize);
+    } else {
+        throw new EXCEPTION("no alac.alac.magicCookie property");
+    }
+
+    return trackId;
+}
+
 MP4TrackId MP4File::AddEncAudioTrack(uint32_t timeScale,
                                      MP4Duration sampleDuration,
                                      uint8_t audioType,

@@ -251,6 +251,13 @@ private:
     MP4DAc3Atom &operator= ( const MP4DAc3Atom &src );
 };
 
+class MP4AlacAtom : public MP4Atom {
+public:
+    MP4AlacAtom(MP4File &file);
+    void Generate();
+    void Read();
+};
+
 class MP4Mp4sAtom : public MP4Atom {
 public:
     MP4Mp4sAtom(MP4File &file);
